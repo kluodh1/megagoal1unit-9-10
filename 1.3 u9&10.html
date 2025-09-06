@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mega Goal 1.3 Grammar and Vocabulary Quiz Game</title>
+    <style>
+        :root {
+            --primary: #ff69b4;
+            --primary-light: #ffa6d5;
+            --primary-dark: #c74b8e;
+            --secondary: #f8f9fa;
+            --text: #333;
+            --correct: #28a745;
+            --wrong: #dc3545;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--primary-dark);
+        }
+        
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn-large {
+            font-size: 1.2rem;
+            padding: 12px 24px;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .screen {
+            display: none;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .active {
+            display: block;
+        }
+        
+        #start-screen {
+            text-align: center;
+        }
+        
+        .team-setup {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .team-input {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 180px;
+        }
+        
+        .team-input input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--primary-light);
+            border-radius: 5px;
+            margin-top: 5px;
+            font-size: 1rem;
+        }
+        
+        .team-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-bottom: 5px;
+        }
+        
+        #quiz-screen .header-info {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .timer {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-dark);
+        }
+        
+        .main-timer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            border: 3px solid var(--primary);
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .main-timer-label {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .main-timer-display {
+            font-size: 4rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            font-family: 'Courier New', monospace;
+            line-height: 1;
+        }
+        
+        .main-timer-display.warning {
+            color: var(--wrong);
+            animation: timerPulse 1s infinite;
+        }
+        
+        @keyframes timerPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .question-number {
+            font-size: 1.2rem;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin: 10px 0 20px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .question-container {
+            margin-bottom: 30px;
+        }
+        
+        .question {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .option {
+            background-color: white;
+            border: 2px solid var(--primary-light);
+            border-radius: 8px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+        
+        .option:hover {
+            background-color: var(--primary-light);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .option.correct {
+            background-color: var(--correct);
+            color: white;
+            border-color: var(--correct);
+        }
+        
+        .option.wrong {
+            background-color: var(--wrong);
+            color: white;
+            border-color: var(--wrong);
+        }
+        
+        .extra-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        #leaderboard-screen table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        #leaderboard-screen th, #leaderboard-screen td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        #leaderboard-screen th {
+            background-color: var(--primary-light);
+            color: white;
+        }
+        
+        #leaderboard-screen tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        #leaderboard-screen tr:hover {
+            background-color: #ddd;
+        }
+        
+        .leaderboard-trophy {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+        
+        #review-screen .review-item {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary);
+            background-color: #f9f9f9;
+        }
+        
+        #review-screen .review-question {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        #review-screen .review-answer {
+            color: var(--correct);
+        }
+        
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .celebration-correct {
+            background-color: rgba(40, 167, 69, 0.3);
+        }
+        
+        .celebration-wrong {
+            background-color: rgba(220, 53, 69, 0.3);
+        }
+        
+        .celebration-text {
+            font-size: 4rem;
+            font-weight: bold;
+            animation: zoomInOut 1s ease;
+        }
+        
+        @keyframes zoomInOut {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+        
+        .team-select {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+        }
+        
+        .team-select select {
+            padding: 10px;
+            border: 2px solid var(--primary-light);
+            border-radius: 5px;
+            font-size: 1rem;
+            margin-right: 10px;
+        }
+        
+        .teams-scoreboard {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+            justify-content: center;
+        }
+        
+        .team-score-item {
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            color: white;
+            display: flex;
+            align-items: center;
+            min-width: 120px;
+            justify-content: space-between;
+        }
+        
+        .team-score-item.active {
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .ask-class {
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .options {
+                grid-template-columns: 1fr;
+            }
+            
+            .team-setup {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .extra-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+        
+        .falling-object {
+            position: fixed;
+            z-index: 1000;
+            pointer-events: none;
+            user-select: none;
+        }
+        
+        .streak-counter {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            background-color: var(--primary);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .streak-counter.pulse {
+            animation: pulse 0.5s ease;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .bonus-points {
+            position: absolute;
+            color: gold;
+            font-weight: bold;
+            font-size: 24px;
+            pointer-events: none;
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+            z-index: 100;
+            animation: float-up 2s ease-out forwards;
+        }
+        
+        @keyframes float-up {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-100px); opacity: 0; }
+        }
+        
+        .power-ups {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .power-up {
+            padding: 5px 10px;
+            border-radius: 15px;
+            background-color: #f0f0f0;
+            border: 2px solid var(--primary-light);
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .power-up:hover {
+            background-color: var(--primary-light);
+            color: white;
+        }
+        
+        .power-up[disabled] {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .power-up.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 0 15px rgba(255, 105, 180, 0.5);
+            animation: activeGlow 2s infinite;
+        }
+        
+        @keyframes activeGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(255, 105, 180, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(255, 105, 180, 0.8); }
+        }
+        
+        .power-up-feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--primary);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            z-index: 999;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            animation: powerUpFeedback 2s ease-out forwards;
+        }
+        
+        @keyframes powerUpFeedback {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            20% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+        }
+        
+        .power-up-icon {
+            font-size: 18px;
+        }
+        
+        /* Custom Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 30px;
+            border: none;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            text-align: center;
+            position: relative;
+        }
+        
+        .modal-header {
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 2rem;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+        }
+        
+        .modal-subtitle {
+            font-size: 1.2rem;
+            color: #666;
+        }
+        
+        .discussion-timer {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .discussion-timer.warning {
+            color: var(--wrong);
+            animation: pulse 1s infinite;
+        }
+        
+        .modal-actions {
+            margin-top: 30px;
+        }
+        
+        .modal-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+        }
+        
+        .modal-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .modal-btn-secondary {
+            background-color: #6c757d;
+        }
+        
+        .modal-btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Mega Goal 1.3</h1>
+            <p>Grammar and Vocabulary Quiz Game - Units 9 & 10</p>
+        </header>
+        
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen active">
+            <h2>Team Setup</h2>
+            <div class="team-setup">
+                <div class="team-input">
+                    <div class="team-color" style="background-color: #ff69b4;"></div>
+                    <label>Team 1</label>
+                    <input type="text" id="team1-name" placeholder="Team Name" value="Pink Panthers">
+                </div>
+                <div class="team-input">
+                    <div class="team-color" style="background-color: #4dabf7;"></div>
+                    <label>Team 2</label>
+                    <input type="text" id="team2-name" placeholder="Team Name" value="Blue Sharks">
+                </div>
+                <div class="team-input">
+                    <div class="team-color" style="background-color: #82c91e;"></div>
+                    <label>Team 3</label>
+                    <input type="text" id="team3-name" placeholder="Team Name" value="Green Dragons">
+                </div>
+                <div class="team-input">
+                    <div class="team-color" style="background-color: #fab005;"></div>
+                    <label>Team 4</label>
+                    <input type="text" id="team4-name" placeholder="Team Name" value="Yellow Stars">
+                </div>
+                <div class="team-input">
+                    <div class="team-color" style="background-color: #be4bdb;"></div>
+                    <label>Team 5</label>
+                    <input type="text" id="team5-name" placeholder="Team Name" value="Purple Wizards">
+                </div>
+                <div class="team-input">
+                    <div class="team-color" style="background-color: #fd7e14;"></div>
+                    <label>Team 6</label>
+                    <input type="text" id="team6-name" placeholder="Team Name" value="Orange Tigers">
+                </div>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <label>
+                    <input type="checkbox" id="auto-rotate" checked>
+                    Automatically rotate teams after each question
+                </label>
+            </div>
+            
+            <button id="start-btn" class="btn btn-large">Start Quiz</button>
+        </div>
+        
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="screen">
+            <div class="header-info">
+                <div class="question-number">Question <span id="current-question">1</span>/<span id="total-questions">10</span></div>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-bar"></div>
+            </div>
+            
+            <div class="team-select">
+                <label>Current Team: </label>
+                <select id="team-selector">
+                    <option value="0">Pink Panthers</option>
+                    <option value="1">Blue Sharks</option>
+                    <option value="2">Green Dragons</option>
+                    <option value="3">Yellow Stars</option>
+                    <option value="4">Purple Wizards</option>
+                    <option value="5">Orange Tigers</option>
+                </select>
+            </div>
+            
+            <div class="teams-scoreboard" id="teams-scoreboard">
+                <!-- Will be populated with all teams and scores -->
+            </div>
+            
+            <div class="main-timer">
+                <div class="main-timer-label">Time Remaining</div>
+                <div class="main-timer-display" id="time-left-display">60</div>
+            </div>
+            
+            <div class="power-ups">
+                <button class="power-up" id="fifty-fifty">
+                    <span class="power-up-icon">🎯</span> 50:50
+                </button>
+                <button class="power-up" id="double-points">
+                    <span class="power-up-icon">✨</span> Double Points
+                </button>
+                <button class="power-up" id="skip-question">
+                    <span class="power-up-icon">⏭️</span> Skip
+                </button>
+            </div>
+            
+            <div class="question-container">
+                <div class="question" id="question-text">Loading question...</div>
+                <div class="options" id="options-container">
+                    <div class="option">Loading options...</div>
+                </div>
+            </div>
+            
+            <div class="ask-class">
+                <button id="ask-class-btn" class="btn">Ask The Class</button>
+            </div>
+            
+            <div class="extra-actions">
+                <button id="leaderboard-btn" class="btn">View Leaderboard</button>
+                <button id="next-btn" class="btn" disabled>Next Question</button>
+            </div>
+        </div>
+        
+        <!-- Leaderboard Screen -->
+        <div id="leaderboard-screen" class="screen">
+            <h2>Leaderboard</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Team</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <!-- Dynamically populated -->
+                </tbody>
+            </table>
+            
+            <button id="continue-btn" class="btn btn-large">Continue</button>
+        </div>
+        
+        <!-- Review Screen -->
+        <div id="review-screen" class="screen">
+            <h2>Review</h2>
+            <div id="review-content">
+                <!-- Dynamically populated -->
+            </div>
+            
+            <button id="restart-btn" class="btn btn-large">Restart Quiz</button>
+        </div>
+        
+        <div class="footer">
+            <p><strong style="color: #ff69b4;">Created by Teacher Kholoud Alharthi - 2025</strong></p>
+        </div>
+    </div>
+    
+    <!-- Custom Modal for Class Discussion -->
+    <div id="discussionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">🤔 Class Discussion Time!</h2>
+                <p class="modal-subtitle">Let's discuss this question together</p>
+            </div>
+            
+            <div class="discussion-timer" id="discussionTimer">30</div>
+            
+            <div class="modal-actions">
+                <button id="endDiscussionBtn" class="modal-btn">End Discussion</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Audio Effects -->
+    <audio id="click-sound">
+        <source src="/api/placeholder/1/1" type="audio/mp3">
+    </audio>
+    <audio id="correct-sound">
+        <source src="/api/placeholder/1/1" type="audio/mp3">
+    </audio>
+    <audio id="wrong-sound">
+        <source src="/api/placeholder/1/1" type="audio/mp3">
+    </audio>
+    
+    <script>
+        // Quiz data with content from Units 9 & 10
+        const quizData = [
+            {
+                question: "The car _______ repaired.",
+                options: ["needs", "needs to", "needs to be", "need"],
+                correctAnswer: 2,
+                explanation: "The correct form is 'needs to be' when talking about something requiring an action to be done to it. 'Needs' alone is incomplete, 'needs to' requires an active verb after it, and 'need' is not correctly conjugated."
+            },
+            {
+                question: "She got the car _______.",
+                options: ["fix", "fixes", "fixed", "fixing"],
+                correctAnswer: 2,
+                explanation: "The correct form is 'fixed' (past participle) after 'got' in the causative form, meaning she arranged for someone else to fix it. 'Fix' is base form, 'fixes' is present tense, and 'fixing' would make it a different structure."
+            },
+            {
+                question: "The customer returned the _______ sleeve.",
+                options: ["tor", "torn", "tear", "tore"],
+                correctAnswer: 1,
+                explanation: "The correct form is 'torn' which is the past participle of 'tear' used as an adjective. 'Tor' is not related to fabric condition, 'tear' is the verb or noun form, and 'tore' is past tense not used as an adjective."
+            },
+            {
+                question: "_______ Kholoud cleaned her room?",
+                options: ["Has", "Have", "Is", "Did"],
+                correctAnswer: 0,
+                explanation: "The correct auxiliary verb is 'Has' because 'Kholoud' is third person singular and requires 'has' in present perfect questions. 'Have' is used with plural subjects or I/you/we/they."
+            },
+            {
+                question: "Have you cleaned the room _______?",
+                options: ["yet", "already", "just", "now"],
+                correctAnswer: 0,
+                explanation: "The correct adverb is 'yet' which is used in questions and negative statements with present perfect to ask if something has happened up to now. 'Already' is used in positive statements, 'just' indicates very recent completion."
+            },
+            {
+                question: "Excuse me, I can't find my phone, can you help _______?",
+                options: ["me", "you", "us", "them"],
+                correctAnswer: 0,
+                explanation: "The correct pronoun is 'me' because the speaker is asking for help for themselves. 'You' would refer to the person being asked, 'us' would include others, and 'them' refers to others not including the speaker."
+            },
+            {
+                question: "They need to _______ their experiment.",
+                options: ["do", "did", "done", "doing"],
+                correctAnswer: 0,
+                explanation: "The correct form is 'do' as the base form follows 'to' in an infinitive. 'Did' is past tense, 'done' is past participle, and 'doing' is the present participle form."
+            },
+            {
+                question: "When I _______ at the cinema, the movie had started.",
+                options: ["had arrived", "arrive", "arrived", "arriving"],
+                correctAnswer: 2,
+                explanation: "The correct form is 'arrived' (simple past) because it happened before 'the movie had started' (past perfect). 'Had arrived' would be used if it happened before another past action, 'arrive' is present tense."
+            },
+            {
+                question: "Before she called, she _______ her bedroom.",
+                options: ["cleaned", "clean", "had cleaned", "was cleaning"],
+                correctAnswer: 2,
+                explanation: "The correct form is 'had cleaned' (past perfect) because it happened before 'she called' (simple past). 'Cleaned' would be simple past, 'clean' is present tense or base form."
+            },
+            {
+                question: "Do you like coffee _______ tea?",
+                options: ["but", "yet", "or", "and"],
+                correctAnswer: 2,
+                explanation: "The correct conjunction is 'or' to express a choice between alternatives. 'But' shows contrast, 'yet' is used for time or contrast, and 'and' would indicate both together."
+            },
+            {
+                question: "If you heat ice, it _______.",
+                options: ["melt", "melts", "melting", "will melt"],
+                correctAnswer: 1,
+                explanation: "The correct form is 'melts' because in zero conditional (scientific facts), we use present simple in both clauses. 'Melt' is base form without proper conjugation, 'melting' is present participle."
+            },
+            {
+                question: "If it rains, we _______ the trip.",
+                options: ["will cancel", "will cancels", "cancel", "cancelled"],
+                correctAnswer: 0,
+                explanation: "The correct form is 'will cancel' because in first conditional (possible future), we use 'will' + base verb in the result clause. 'Will cancels' has incorrect subject-verb agreement, 'cancel' is present tense."
+            },
+            {
+                question: "If I win the race, I _______ a lot.",
+                options: ["might", "may", "might travel", "will travel"],
+                correctAnswer: 2,
+                explanation: "The correct form is 'might travel' to complete the sentence with a verb. 'Might' and 'may' alone would be incomplete without a verb following them."
+            },
+            {
+                question: "I want to buy this car, _______ I don't have enough money.",
+                options: ["and", "so", "but", "or"],
+                correctAnswer: 2,
+                explanation: "The correct conjunction is 'but' to show contrast between wanting the car and not having enough money. 'And' would not show this contrast, 'so' indicates result, 'or' indicates alternatives."
+            },
+            {
+                question: "Amal has returned the _______ jacket.",
+                options: ["torn", "faded", "fuzzy", "backup"],
+                correctAnswer: 0,
+                explanation: "The correct word is 'torn' which describes a jacket with rips or cuts in the fabric. 'Faded' means loss of color, 'fuzzy' refers to texture, and 'backup' is unrelated to condition of clothing."
+            },
+            {
+                question: "The screen suddenly went _______.",
+                options: ["torn", "faded", "fuzzy", "backup"],
+                correctAnswer: 2,
+                explanation: "The correct word is 'fuzzy' which describes an unclear, static-filled screen. 'Torn' refers to physical damage, 'faded' means loss of color or brightness, and 'backup' is unrelated to screen condition."
+            },
+            {
+                question: "He was wearing _______ blue jeans.",
+                options: ["torn", "faded", "fuzzy", "backup"],
+                correctAnswer: 1,
+                explanation: "The correct word is 'faded' which describes jeans that have lost their color over time. 'Torn' refers to rips in fabric, 'fuzzy' refers to texture, and 'backup' is unrelated to clothing appearance."
+            },
+            {
+                question: "Make a _______ of any work you do on the computer.",
+                options: ["torn", "faded", "fuzzy", "backup"],
+                correctAnswer: 3,
+                explanation: "The correct word is 'backup' which means a copy saved for safety. 'Torn', 'faded', and 'fuzzy' are all adjectives describing physical conditions and are not related to computer data management."
+            },
+            {
+                question: "What does 'refund' mean?",
+                options: ["very dirty", "a lot of", "get the payment back", "return something"],
+                correctAnswer: 2,
+                explanation: "A 'refund' means getting your payment back. 'Very dirty' defines 'filthy', 'a lot of' defines 'plenty', and 'return something' is related but not the definition of refund."
+            },
+            {
+                question: "What does 'filthy' mean?",
+                options: ["very dirty", "a lot of", "get the payment back", "extremely clean"],
+                correctAnswer: 0,
+                explanation: "'Filthy' means very dirty or extremely unclean. 'A lot of' defines 'plenty', 'get the payment back' defines 'refund', and 'extremely clean' is the opposite meaning."
+            },
+            {
+                question: "The other boys _______ him because he is fat.",
+                options: ["wonder", "tornado", "teased", "remote"],
+                correctAnswer: 2,
+                explanation: "The correct word is 'teased' which means to make fun of someone. 'Wonder' means to question or be curious, 'tornado' is a type of storm, and 'remote' means distant."
+            },
+            {
+                question: "The _______ destroyed everything in its path.",
+                options: ["wonder", "tornado", "teased", "remote"],
+                correctAnswer: 1,
+                explanation: "The correct word is 'tornado' which is a destructive, funnel-shaped windstorm. 'Wonder' means to question, 'teased' is a form of mockery, and 'remote' means distant."
+            },
+            {
+                question: "I _______ who that letter was from?",
+                options: ["wonder", "tornado", "teased", "remote"],
+                correctAnswer: 0,
+                explanation: "The correct word is 'wonder' which means to be curious or want to know something. 'Tornado' is a natural disaster, 'teased' means to mock someone, and 'remote' means distant."
+            },
+            {
+                question: "They lived in a _______ mountain village.",
+                options: ["wonder", "tornado", "teased", "remote"],
+                correctAnswer: 3,
+                explanation: "The correct word is 'remote' which means distant or far away from other populated areas. 'Wonder' means to question, 'tornado' is a type of storm, and 'teased' is a form of mockery."
+            },
+            {
+                question: "What does 'Gee' express?",
+                options: ["I have no idea", "an exclamation to express surprise", "a question", "agreement"],
+                correctAnswer: 1,
+                explanation: "'Gee' is an exclamation used to express surprise. 'I have no idea' is the meaning of 'beats me', not 'gee'."
+            },
+            {
+                question: "What does 'Beats me' mean?",
+                options: ["I have no idea", "an exclamation to express surprise", "to hit someone", "to win"],
+                correctAnswer: 0,
+                explanation: "'Beats me' is an informal expression meaning 'I have no idea' or 'I don't know'. It doesn't mean to physically beat someone or to win against someone."
+            }
+        ];
+
+        // Game state
+        let currentQuestion = 0;
+        let timer;
+        let timeLeft = 60;
+        let teams = [
+            { name: "Pink Panthers", score: 0, streak: 0, powerUps: { fiftyFifty: 1, doublePoints: 1, skip: 1 } },
+            { name: "Blue Sharks", score: 0, streak: 0, powerUps: { fiftyFifty: 1, doublePoints: 1, skip: 1 } },
+            { name: "Green Dragons", score: 0, streak: 0, powerUps: { fiftyFifty: 1, doublePoints: 1, skip: 1 } },
+            { name: "Yellow Stars", score: 0, streak: 0, powerUps: { fiftyFifty: 1, doublePoints: 1, skip: 1 } },
+            { name: "Purple Wizards", score: 0, streak: 0, powerUps: { fiftyFifty: 1, doublePoints: 1, skip: 1 } },
+            { name: "Orange Tigers", score: 0, streak: 0, powerUps: { fiftyFifty: 1, doublePoints: 1, skip: 1 } }
+        ];
+        let currentTeam = 0;
+        let autoRotateTeams = true;
+        let selectedOption = null;
+        let answeredQuestions = [];
+        let doublePointsActive = false;
+        let helpUsed = false; // Track if help (50:50 or class discussion) was used
+
+        // DOM elements
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const leaderboardScreen = document.getElementById('leaderboard-screen');
+        const reviewScreen = document.getElementById('review-screen');
+        
+        const startBtn = document.getElementById('start-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const leaderboardBtn = document.getElementById('leaderboard-btn');
+        const continueBtn = document.getElementById('continue-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const askClassBtn = document.getElementById('ask-class-btn');
+        
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const currentQuestionElem = document.getElementById('current-question');
+        const totalQuestionsElem = document.getElementById('total-questions');
+        const timeLeftElem = document.getElementById('time-left-display');
+        const progressBar = document.querySelector('.progress-bar');
+        const teamSelector = document.getElementById('team-selector');
+        const leaderboardBody = document.getElementById('leaderboard-body');
+        const reviewContent = document.getElementById('review-content');
+        
+        // Power-up buttons
+        const fiftyFiftyBtn = document.getElementById('fifty-fifty');
+        const doublePointsBtn = document.getElementById('double-points');
+        const skipQuestionBtn = document.getElementById('skip-question');
+        
+        // Modal elements
+        const discussionModal = document.getElementById('discussionModal');
+        const discussionTimer = document.getElementById('discussionTimer');
+        const endDiscussionBtn = document.getElementById('endDiscussionBtn');
+        
+        // Audio elements
+        const clickSound = document.getElementById('click-sound');
+        const correctSound = document.getElementById('correct-sound');
+        const wrongSound = document.getElementById('wrong-sound');
+        
+        // Initialize the quiz
+        function initQuiz() {
+            // Get team names from inputs
+            for (let i = 1; i <= 6; i++) {
+                const teamNameInput = document.getElementById(`team${i}-name`);
+                if (teamNameInput.value.trim() !== '') {
+                    teams[i-1].name = teamNameInput.value.trim();
+                }
+            }
+            
+            // Get auto-rotate setting
+            autoRotateTeams = document.getElementById('auto-rotate').checked;
+            
+            // Update team selector
+            while (teamSelector.firstChild) {
+                teamSelector.removeChild(teamSelector.firstChild);
+            }
+            
+            teams.forEach((team, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = team.name;
+                teamSelector.appendChild(option);
+            });
+            
+            // Set total questions
+            totalQuestionsElem.textContent = quizData.length;
+            
+            // Hide start screen, show quiz screen
+            startScreen.classList.remove('active');
+            quizScreen.classList.add('active');
+            
+            // Initialize teams scoreboard
+            updateTeamsScoreboard();
+            
+            // Initialize power-ups
+            updatePowerUpsDisplay();
+            
+            // Load first question
+            loadQuestion();
+            
+            // Start timer
+            startTimer();
+        }
+        
+        // Load question
+        function loadQuestion() {
+            const question = quizData[currentQuestion];
+            
+            // Update question number and progress bar
+            currentQuestionElem.textContent = currentQuestion + 1;
+            progressBar.style.width = `${((currentQuestion + 1) / quizData.length) * 100}%`;
+            
+            // Set question text
+            questionText.textContent = question.question;
+            
+            // Clear options container
+            optionsContainer.innerHTML = '';
+            
+            // Add options
+            question.options.forEach((option, index) => {
+                const optionElem = document.createElement('div');
+                optionElem.classList.add('option');
+                optionElem.textContent = option;
+                optionElem.dataset.index = index;
+                optionElem.addEventListener('click', selectOption);
+                optionsContainer.appendChild(optionElem);
+            });
+            
+            // Reset timer
+            timeLeft = 60;
+            timeLeftElem.textContent = timeLeft;
+            
+            // Enable ask class button
+            askClassBtn.disabled = false;
+            
+            // Reset selected option and help used flag
+            selectedOption = null;
+            helpUsed = false;
+            
+            // Disable next button
+            nextBtn.disabled = true;
+            
+            // Update power-ups display
+            updatePowerUpsDisplay();
+        }
+        
+        // Select option
+        function selectOption() {
+            if (selectedOption !== null) return; // Already answered
+            
+            playSound(clickSound);
+            
+            const selectedIndex = parseInt(this.dataset.index);
+            const correctIndex = quizData[currentQuestion].correctAnswer;
+            
+            selectedOption = selectedIndex;
+            
+            // Highlight selected option
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                const index = parseInt(option.dataset.index);
+                
+                if (index === selectedIndex) {
+                    if (index === correctIndex) {
+                        option.classList.add('correct');
+                        
+                        // Calculate points
+                        let pointsEarned = 10;
+                        
+                        // Reduce points if help was used
+                        if (helpUsed) {
+                            pointsEarned = 5; // Half points when help is used
+                        }
+                        
+                        // Add streak bonus
+                        teams[currentTeam].streak++;
+                        if (teams[currentTeam].streak >= 3) {
+                            const streakBonus = Math.floor(teams[currentTeam].streak / 3) * 5;
+                            pointsEarned += streakBonus;
+                            
+                            // Show bonus points animation
+                            showBonusPoints(streakBonus);
+                        }
+                        
+                        // Apply double points if active
+                        if (doublePointsActive) {
+                            pointsEarned *= 2;
+                            doublePointsActive = false;
+                            updatePowerUpsDisplay();
+                            
+                            // Show bonus points animation
+                            showBonusPoints("2x");
+                        }
+                        
+                        teams[currentTeam].score += pointsEarned;
+                        updateTeamScore();
+                        showCelebration(true);
+                        playSound(correctSound);
+                    } else {
+                        option.classList.add('wrong');
+                        // Reset streak on wrong answer
+                        teams[currentTeam].streak = 0;
+                        // Deactivate double points on wrong answer
+                        if (doublePointsActive) {
+                            doublePointsActive = false;
+                            updatePowerUpsDisplay();
+                        }
+                        showCelebration(false);
+                        playSound(wrongSound);
+                    }
+                } else if (index === correctIndex) {
+                    option.classList.add('correct');
+                }
+            });
+            
+            // Store answered question
+            answeredQuestions.push({
+                question: quizData[currentQuestion].question,
+                selectedAnswer: selectedIndex,
+                correctAnswer: correctIndex,
+                isCorrect: selectedIndex === correctIndex
+            });
+            
+            // Enable next button
+            nextBtn.disabled = false;
+            
+            // Disable ask class button
+            askClassBtn.disabled = true;
+            
+            // Clear timer
+            clearInterval(timer);
+        }
+        
+        // Start timer
+        function startTimer() {
+            clearInterval(timer);
+            timeLeftElem.classList.remove('warning'); // Remove warning class when starting
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                timeLeftElem.textContent = timeLeft;
+                
+                // Add warning animation when time is low
+                if (timeLeft <= 10) {
+                    timeLeftElem.classList.add('warning');
+                } else {
+                    timeLeftElem.classList.remove('warning');
+                }
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    if (selectedOption === null) {
+                        // Auto-select wrong answer if time runs out
+                        const correctIndex = quizData[currentQuestion].correctAnswer;
+                        
+                        // Highlight correct answer
+                        const options = document.querySelectorAll('.option');
+                        options.forEach(option => {
+                            const index = parseInt(option.dataset.index);
+                            if (index === correctIndex) {
+                                option.classList.add('correct');
+                            }
+                        });
+                        
+                        // Store answered question
+                        answeredQuestions.push({
+                            question: quizData[currentQuestion].question,
+                            selectedAnswer: null,
+                            correctAnswer: correctIndex,
+                            isCorrect: false
+                        });
+                        
+                        // Show wrong celebration
+                        showCelebration(false);
+                        playSound(wrongSound);
+                        
+                        // Enable next button
+                        nextBtn.disabled = false;
+                        
+                        // Disable ask class button
+                        askClassBtn.disabled = true;
+                    }
+                }
+            }, 1000);
+        }
+        
+        // Next question
+        function nextQuestion() {
+            playSound(clickSound);
+            
+            currentQuestion++;
+            
+            // Auto-rotate to next team
+            if (autoRotateTeams) {
+                currentTeam = (currentTeam + 1) % teams.length;
+                teamSelector.value = currentTeam;
+            }
+            
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+                startTimer();
+            } else {
+                // End of quiz, show leaderboard
+                showLeaderboard();
+            }
+        }
+        
+        // Show leaderboard
+        function showLeaderboard() {
+            // Clear previous leaderboard
+            leaderboardBody.innerHTML = '';
+            
+            // Sort teams by score
+            const sortedTeams = [...teams].sort((a, b) => b.score - a.score);
+            
+            // Add teams to leaderboard
+            sortedTeams.forEach((team, index) => {
+                const row = document.createElement('tr');
+                
+                const rankCell = document.createElement('td');
+                rankCell.innerHTML = index === 0 ? '🏆 1' : (index + 1);
+                
+                const nameCell = document.createElement('td');
+                nameCell.textContent = team.name;
+                
+                const scoreCell = document.createElement('td');
+                scoreCell.textContent = team.score;
+                
+                row.appendChild(rankCell);
+                row.appendChild(nameCell);
+                row.appendChild(scoreCell);
+                
+                leaderboardBody.appendChild(row);
+            });
+            
+            // Show leaderboard screen
+            quizScreen.classList.remove('active');
+            leaderboardScreen.classList.add('active');
+        }
+        
+        // Continue to review
+        function continueToReview() {
+            playSound(clickSound);
+            
+            // Clear previous review content
+            reviewContent.innerHTML = '';
+            
+            // Add answered questions to review
+            answeredQuestions.forEach((item, index) => {
+                const reviewItem = document.createElement('div');
+                reviewItem.classList.add('review-item');
+                
+                const reviewQuestion = document.createElement('div');
+                reviewQuestion.classList.add('review-question');
+                reviewQuestion.textContent = `${index + 1}. ${item.question}`;
+                
+                const reviewAnswer = document.createElement('div');
+                reviewAnswer.classList.add('review-answer');
+                
+                if (item.selectedAnswer === null) {
+                    reviewAnswer.textContent = `Time ran out. Correct answer: ${quizData[index].options[item.correctAnswer]}`;
+                } else if (item.isCorrect) {
+                    reviewAnswer.textContent = `Correct: ${quizData[index].options[item.correctAnswer]}`;
+                } else {
+                    reviewAnswer.textContent = `Your answer: ${quizData[index].options[item.selectedAnswer]} | Correct answer: ${quizData[index].options[item.correctAnswer]}`;
+                }
+                
+                const explanation = document.createElement('div');
+                explanation.classList.add('review-explanation');
+                explanation.textContent = quizData[index].explanation;
+                
+                reviewItem.appendChild(reviewQuestion);
+                reviewItem.appendChild(reviewAnswer);
+                reviewItem.appendChild(explanation);
+                
+                reviewContent.appendChild(reviewItem);
+            });
+            
+            // Show review screen
+            leaderboardScreen.classList.remove('active');
+            reviewScreen.classList.add('active');
+        }
+        
+        // Restart quiz
+        function restartQuiz() {
+            playSound(clickSound);
+            
+            // Reset game state
+            currentQuestion = 0;
+            timeLeft = 60;
+            teams.forEach(team => team.score = 0);
+            answeredQuestions = [];
+            
+            // Reset UI
+            reviewScreen.classList.remove('active');
+            startScreen.classList.add('active');
+        }
+        
+        // Show celebration
+        function showCelebration(isCorrect) {
+            const celebration = document.createElement('div');
+            celebration.classList.add('celebration');
+            
+            if (isCorrect) {
+                celebration.classList.add('celebration-correct');
+                
+                const text = document.createElement('div');
+                text.classList.add('celebration-text');
+                text.textContent = 'CORRECT!';
+                text.style.color = 'var(--correct)';
+                
+                celebration.appendChild(text);
+                
+                // Create falling objects animation
+                createFallingObjects(30);
+            } else {
+                celebration.classList.add('celebration-wrong');
+                
+                const text = document.createElement('div');
+                text.classList.add('celebration-text');
+                text.textContent = 'WRONG!';
+                text.style.color = 'var(--wrong)';
+                
+                celebration.appendChild(text);
+                
+                // Create sad emojis animation
+                createFallingObjects(15, true);
+            }
+            
+            document.body.appendChild(celebration);
+            
+            // Remove celebration after animation
+            setTimeout(() => {
+                document.body.removeChild(celebration);
+            }, 1500);
+        }
+        
+        // Create falling objects animation
+        function createFallingObjects(count, isSad = false) {
+            const happyObjects = ['🌟', '✨', '🎉', '🎊', '👏', '🥳', '🏆', '💯', '📚', '✅'];
+            const sadObjects = ['😔', '😢', '😭', '💔', '👎', '😞', '😓', '🤦', '❌', '⛔'];
+            
+            const objects = isSad ? sadObjects : happyObjects;
+            
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const object = document.createElement('div');
+                    object.classList.add('falling-object');
+                    
+                    // Random position
+                    const x = Math.random() * window.innerWidth;
+                    
+                    // Random object
+                    const randomObject = objects[Math.floor(Math.random() * objects.length)];
+                    
+                    // Random size
+                    const size = Math.random() * 20 + 20;
+                    
+                    // Random speed
+                    const speed = Math.random() * 6 + 3;
+                    
+                    // Random rotation
+                    const rotation = Math.random() * 360;
+                    
+                    // Set styles
+                    object.style.left = `${x}px`;
+                    object.style.top = '-50px';
+                    object.style.fontSize = `${size}px`;
+                    object.style.transform = `rotate(${rotation}deg)`;
+                    object.textContent = randomObject;
+                    
+                    document.body.appendChild(object);
+                    
+                    // Animate falling
+                    const fallAnimation = object.animate([
+                        { top: '-50px', opacity: 1 },
+                        { top: '105vh', opacity: 0.7 }
+                    ], {
+                        duration: speed * 1000,
+                        easing: 'linear'
+                    });
+                    
+                    // Remove after animation completes
+                    fallAnimation.onfinish = () => {
+                        document.body.removeChild(object);
+                    };
+                }, i * 100);
+            }
+        }
+        
+        // Create confetti
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.classList.add('confetti');
+            
+            // Random position
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight;
+            
+            // Random color
+            const colors = ['#ff69b4', '#ffa6d5', '#ff94c2', '#ff79b0', '#ff3e96'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            // Random size
+            const size = Math.random() * 10 + 5;
+            
+            // Set properties
+            confetti.style.left = `${x}px`;
+            confetti.style.top = `${y}px`;
+            confetti.style.backgroundColor = color;
+            confetti.style.width = `${size}px`;
+            confetti.style.height = `${size}px`;
+            
+            // Add to body
+            document.body.appendChild(confetti);
+            
+            // Animate
+            const duration = Math.random() * 3000 + 2000;
+            const rotation = Math.random() * 360;
+            const xEnd = x + (Math.random() * 200 - 100);
+            const yEnd = y + Math.random() * 200 + 100;
+            
+            confetti.style.transition = `transform ${duration/1000}s ease, top ${duration/1000}s ease, left ${duration/1000}s ease, opacity ${duration/1000}s ease`;
+            
+            // Start animation after small delay
+            setTimeout(() => {
+                confetti.style.opacity = '1';
+            }, 10);
+            
+            setTimeout(() => {
+                confetti.style.transform = `rotate(${rotation}deg)`;
+                confetti.style.top = `${yEnd}px`;
+                confetti.style.left = `${xEnd}px`;
+                confetti.style.opacity = '0';
+            }, 50);
+            
+            // Remove after animation
+            setTimeout(() => {
+                document.body.removeChild(confetti);
+            }, duration);
+        }
+        
+        // Show power-up feedback
+        function showPowerUpFeedback(message) {
+            const feedback = document.createElement('div');
+            feedback.classList.add('power-up-feedback');
+            feedback.textContent = message;
+            
+            document.body.appendChild(feedback);
+            
+            // Remove after animation completes
+            setTimeout(() => {
+                if (document.body.contains(feedback)) {
+                    document.body.removeChild(feedback);
+                }
+            }, 2000);
+        }
+        
+        // Play sound
+        function playSound(sound) {
+            try {
+                // Create an AudioContext
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Create sounds programmatically
+                function playTone(type, frequency, duration) {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.type = type;
+                    oscillator.frequency.value = frequency;
+                    
+                    gainNode.gain.value = 0.1;
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.start();
+                    
+                    setTimeout(() => {
+                        oscillator.stop();
+                    }, duration);
+                }
+                
+                if (sound === clickSound) {
+                    playTone('sine', 800, 100);
+                } else if (sound === correctSound) {
+                    // Play correct sound (happy ascending tone)
+                    playTone('sine', 500, 150);
+                    setTimeout(() => playTone('sine', 800, 150), 150);
+                    setTimeout(() => playTone('sine', 1200, 200), 300);
+                } else if (sound === wrongSound) {
+                    // Play wrong sound (descending tone)
+                    playTone('square', 300, 200);
+                    setTimeout(() => playTone('square', 150, 300), 200);
+                }
+            } catch (error) {
+                console.log("Audio play failed: " + error);
+            }
+        }
+        
+        // Update team score
+        function updateTeamScore() {
+            // Update all team scores in the scoreboard
+            updateTeamsScoreboard();
+        }
+        
+        // Update teams scoreboard
+        function updateTeamsScoreboard() {
+            const scoreboard = document.getElementById('teams-scoreboard');
+            scoreboard.innerHTML = '';
+            
+            // Team colors
+            const teamColors = [
+                '#ff69b4', // Pink
+                '#4dabf7', // Blue
+                '#82c91e', // Green
+                '#fab005', // Yellow
+                '#be4bdb', // Purple
+                '#fd7e14'  // Orange
+            ];
+            
+            teams.forEach((team, index) => {
+                const teamItem = document.createElement('div');
+                teamItem.classList.add('team-score-item');
+                teamItem.style.backgroundColor = teamColors[index];
+                
+                // Highlight the current team
+                if (index === currentTeam) {
+                    teamItem.classList.add('active');
+                }
+                
+                const teamName = document.createElement('span');
+                teamName.textContent = team.name;
+                
+                const teamScore = document.createElement('span');
+                teamScore.textContent = team.score;
+                
+                // Add streak indicator if applicable
+                if (team.streak >= 3) {
+                    const streakIndicator = document.createElement('span');
+                    streakIndicator.textContent = `🔥 x${team.streak}`;
+                    streakIndicator.style.fontSize = '0.8em';
+                    streakIndicator.style.marginLeft = '5px';
+                    teamName.appendChild(streakIndicator);
+                }
+                
+                teamItem.appendChild(teamName);
+                teamItem.appendChild(teamScore);
+                
+                scoreboard.appendChild(teamItem);
+            });
+        }
+        
+        // Ask class with modal dialog
+        function askClass() {
+            playSound(clickSound);
+            helpUsed = true; // Mark that help was used
+            
+            // Show modal
+            discussionModal.style.display = 'block';
+            
+            // Start 30-second countdown
+            let timeLeft = 30;
+            discussionTimer.textContent = timeLeft;
+            discussionTimer.classList.remove('warning');
+            
+            const discussionInterval = setInterval(() => {
+                timeLeft--;
+                discussionTimer.textContent = timeLeft;
+                
+                // Add warning style when time is running low
+                if (timeLeft <= 10) {
+                    discussionTimer.classList.add('warning');
+                }
+                
+                if (timeLeft <= 0) {
+                    clearInterval(discussionInterval);
+                    closeDiscussionModal();
+                }
+            }, 1000);
+            
+            // Store interval ID to clear it if discussion ends early
+            discussionModal.dataset.intervalId = discussionInterval;
+        }
+        
+        // Close discussion modal
+        function closeDiscussionModal() {
+            // Clear the interval if it's still running
+            const intervalId = discussionModal.dataset.intervalId;
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+            
+            // Hide modal
+            discussionModal.style.display = 'none';
+            discussionTimer.classList.remove('warning');
+            
+            playSound(clickSound);
+        }
+        
+        // Show bonus points animation
+        function showBonusPoints(bonus) {
+            const bonusElem = document.createElement('div');
+            bonusElem.classList.add('bonus-points');
+            
+            // Position it near the current team's score
+            const teamElements = document.querySelectorAll('.team-score-item');
+            const currentTeamElement = teamElements[currentTeam];
+            const rect = currentTeamElement.getBoundingClientRect();
+            
+            bonusElem.style.left = `${rect.right - 20}px`;
+            bonusElem.style.top = `${rect.top}px`;
+            
+            if (typeof bonus === 'number') {
+                bonusElem.textContent = `+${bonus}`;
+            } else {
+                bonusElem.textContent = bonus;
+            }
+            
+            document.body.appendChild(bonusElem);
+            
+            // Remove after animation
+            setTimeout(() => {
+                document.body.removeChild(bonusElem);
+            }, 2000);
+        }
+        
+        // Update power-ups display
+        function updatePowerUpsDisplay() {
+            // Update 50:50 button
+            fiftyFiftyBtn.disabled = teams[currentTeam].powerUps.fiftyFifty <= 0 || selectedOption !== null;
+            
+            // Update double points button
+            doublePointsBtn.disabled = teams[currentTeam].powerUps.doublePoints <= 0 || doublePointsActive || selectedOption !== null;
+            
+            if (doublePointsActive) {
+                doublePointsBtn.innerHTML = '<span class="power-up-icon">✨</span> Active!';
+                doublePointsBtn.classList.add('active');
+            } else {
+                doublePointsBtn.innerHTML = '<span class="power-up-icon">✨</span> Double Points';
+                doublePointsBtn.classList.remove('active');
+            }
+            
+            // Update skip button
+            skipQuestionBtn.disabled = teams[currentTeam].powerUps.skip <= 0;
+        }
+        
+        // Use 50:50 power-up
+        function useFiftyFifty() {
+            if (teams[currentTeam].powerUps.fiftyFifty <= 0 || selectedOption !== null) return;
+            
+            playSound(clickSound);
+            helpUsed = true; // Mark that help was used
+            
+            teams[currentTeam].powerUps.fiftyFifty--;
+            updatePowerUpsDisplay();
+            
+            // Show visual feedback
+            showPowerUpFeedback('🎯 50:50 Activated!');
+            
+            const correctIndex = quizData[currentQuestion].correctAnswer;
+            const options = document.querySelectorAll('.option');
+            
+            // Get indices of wrong options
+            const wrongIndices = [];
+            for (let i = 0; i < options.length; i++) {
+                if (i !== correctIndex) {
+                    wrongIndices.push(i);
+                }
+            }
+            
+            // Randomly select two wrong options to remove
+            wrongIndices.sort(() => Math.random() - 0.5);
+            const indicesToRemove = wrongIndices.slice(0, 2);
+            
+            // Hide selected wrong options
+            options.forEach(option => {
+                const index = parseInt(option.dataset.index);
+                if (indicesToRemove.includes(index)) {
+                    option.style.visibility = 'hidden';
+                    option.style.pointerEvents = 'none';
+                }
+            });
+        }
+        
+        // Use double points power-up
+        function useDoublePoints() {
+            if (teams[currentTeam].powerUps.doublePoints <= 0 || doublePointsActive || selectedOption !== null) return;
+            
+            playSound(clickSound);
+            
+            teams[currentTeam].powerUps.doublePoints--;
+            doublePointsActive = true;
+            updatePowerUpsDisplay();
+            
+            // Show visual feedback instead of alert
+            showPowerUpFeedback('✨ Double Points Active!');
+        }
+        
+        // Use skip question power-up
+        function useSkipQuestion() {
+            if (teams[currentTeam].powerUps.skip <= 0) return;
+            
+            playSound(clickSound);
+            
+            teams[currentTeam].powerUps.skip--;
+            updatePowerUpsDisplay();
+            
+            // Show visual feedback
+            showPowerUpFeedback('⏭️ Question Skipped!');
+            
+            // Skip to next question after a brief delay
+            setTimeout(() => {
+                nextQuestion();
+            }, 1000);
+        }
+        
+        // Change team
+        function changeTeam() {
+            currentTeam = parseInt(teamSelector.value);
+            updateTeamsScoreboard();
+            updatePowerUpsDisplay();
+        }
+        
+        // Event listeners
+        startBtn.addEventListener('click', initQuiz);
+        nextBtn.addEventListener('click', nextQuestion);
+        leaderboardBtn.addEventListener('click', showLeaderboard);
+        continueBtn.addEventListener('click', continueToReview);
+        restartBtn.addEventListener('click', restartQuiz);
+        askClassBtn.addEventListener('click', askClass);
+        teamSelector.addEventListener('change', changeTeam);
+        
+        // Power-up event listeners
+        fiftyFiftyBtn.addEventListener('click', useFiftyFifty);
+        doublePointsBtn.addEventListener('click', useDoublePoints);
+        skipQuestionBtn.addEventListener('click', useSkipQuestion);
+        
+        // Modal event listeners
+        endDiscussionBtn.addEventListener('click', closeDiscussionModal);
+        
+        // Close modal when clicking outside of it
+        window.addEventListener('click', function(event) {
+            if (event.target === discussionModal) {
+                closeDiscussionModal();
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
